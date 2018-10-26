@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import quandl
 import math
+from sklearn import preprocessing, svm, model_selection
+from sklearn.linear_model import LinearRegression
 
 df = quandl.get('WIKI/GOOGL')
 #print(df.head())
@@ -20,4 +22,15 @@ forecast_out = int(math.ceil(0.01*len(df)))
 
 df['label'] = df[forecast_col].shift(-forecast_out)
 df.dropna(inplace=True)
-print(df.head())
+#print(df.head())
+
+x = np.array(df.drop(['label'], 1))
+y = np.array(df['label'])
+x = preprocessing.scale(x)
+y = np.array(df['label'])
+
+X_train, X_test, y_train, y_test = model_selection.train_test_split(x, y, test_size=0.2)
+clf = LinearRegression()
+clf.fit(X_train, y_train)
+accuracy = clf.score(X_test, y_test)
+print(accuracy)
